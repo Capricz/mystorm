@@ -21,7 +21,7 @@ public class MySQLTopology {
 		cluster.submitTopology("testrdbms", config, builder.createTopology());
 		
 		Utils.sleep(1000 * 30);
-		
+		//test kill
 		cluster.killTopology("testrdbms");
 		
 		cluster.shutdown();
