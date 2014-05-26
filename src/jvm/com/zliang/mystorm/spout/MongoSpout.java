@@ -1,13 +1,16 @@
 package com.zliang.mystorm.spout;
 
 import java.net.UnknownHostException;
-import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import org.bson.types.BSONTimestamp;
 import org.bson.types.ObjectId;
@@ -155,6 +158,30 @@ public class MongoSpout implements IRichSpout {
         } else {
             return null;
         }
+	}
+	
+	private static List<Object> convertToList(DBObject dbObject) {
+		List<Object> resultList = new LinkedList<>();
+		Set<String> keySet = dbObject.keySet();
+		int index = 0;
+		for (String key : keySet) {
+			Object object = dbObject.get(key);
+			if(object instanceof ObjectId){
+				resultList.add(index, (ObjectId)object);
+			} else if(object instanceof Date){
+				Date date = (Date) object;
+				resultList.add(index,date);
+			} else if(object instanceof BSONTimestamp){
+				BSONTimestamp time = (BSONTimestamp)object;
+				resultList.add(index, time);
+			}else if(object instanceof BasicDBObject){
+				BasicDBObject dbObj = (BasicDBObject)object;
+				Set<Entry<String,Object>> entrySet = dbObj.entrySet();
+				resultList.add(index, entrySet);
+			}
+			index++;
+		}
+		return resultList;
 	}
 	
 }

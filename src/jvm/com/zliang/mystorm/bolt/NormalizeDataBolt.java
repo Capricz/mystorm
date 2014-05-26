@@ -27,30 +27,44 @@ public class NormalizeDataBolt implements IRichBolt {
 	
 	OutputCollector _collector;
 	DateFormat sdf;
+	String[] columnNames;
 
 	@Override
-	public void prepare(Map stormConf, TopologyContext context,OutputCollector collector) {
+	public void prepare(Map config, TopologyContext context,OutputCollector collector) {
 		this._collector = collector;
+		columnNames = (String[])config.get("columnNames");
 		sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 	}
 
 	@Override
 	public void execute(Tuple input) {
-		ObjectId objectId = (ObjectId) input.getValue(0);
-		List<Object> values = input.getValues();
-		BSONTimestamp ts = (BSONTimestamp) values.get(1);
-		Date d = (Date) values.get(2);
-		String dateStr = sdf.format(d);
-		String user = (String) values.get(3);
-		String pass = (String)values.get(4);
 		List a = new ArrayList();
 		a.add(input);
 		
+//		Values values = convertFormatForPA(columnNames,input);
+		
 //		_collector.emit(a, new Values(objectId,ts,dateStr,user,pass));
-		_collector.emit(a, new Values(objectId,ts,d,user,pass));
+		_collector.emit(input.getValues());
 		_collector.ack(input);
 		
 	}
+
+	/*private Values convertFormatForPA(String[] columnNames, Tuple input) {
+		for (int i = 0; i < columnNames.length; i++) {
+			switch(columnNames[i]){
+			case "_id" :
+				ObjectId objectId = (ObjectId) input.getValue(0);
+				List<Object> values = input.getValues();
+				BSONTimestamp ts = (BSONTimestamp) values.get(1);
+				Date d = (Date) values.get(2);
+				String dateStr = sdf.format(d);
+				String user = (String) values.get(3);
+				String pass = (String)values.get(4);
+			}
+		}
+		
+		return null;
+	}*/
 
 	@Override
 	public void cleanup() {
@@ -61,7 +75,7 @@ public class NormalizeDataBolt implements IRichBolt {
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
 //		declarer.declare(new Fields("oid","ts","dateStr","user","pass"));
-		declarer.declare(new Fields("oid","ts","d","user","pass"));
+		declarer.declare(new Fields(columnNames));
 	}
 
 	@Override
