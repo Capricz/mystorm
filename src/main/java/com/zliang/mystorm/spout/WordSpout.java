@@ -8,8 +8,8 @@ import java.util.Random;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.zliang.mystorm.util.StormConstant;
-import com.zliang.mystorm.util.StormUtils;
+import com.zliang.mystorm.util.Const;
+import com.zliang.mystorm.util.Util;
 
 import backtype.storm.Config;
 import backtype.storm.spout.SpoutOutputCollector;
@@ -28,7 +28,7 @@ public class WordSpout extends BaseRichSpout {
 	String field;
 
 	public WordSpout() {
-		field = StormUtils.getConfigProperty(StormConstant.MONGODB_PA_FIELDS);
+		field = Util.getConfigProperty(Const.MONGODB_PA_FIELDS);
 		String[] fieldArr = field.split(",");
 		if(fieldArr.length>0){
 			field = fieldArr[0];
